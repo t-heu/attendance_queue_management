@@ -1,0 +1,150 @@
+* {
+  margin: 0;
+  outline: 0;
+  box-sizing: border-box;
+}
+:root {
+  --color-principal: #2A669D;
+}
+@keyframes fa-blink {
+  0% { opacity: 1; }
+  50% { opacity: 0.5; }
+  100% { opacity: 0; }
+}
+a {
+  text-decoration: none;
+}
+html, body {
+  height: 100%;
+}
+body {
+  line-height: 1.5;
+  font-size: 1rem;
+  background-color: #f0f2f5;
+  font-family: "Arial", sans-serif;
+  -webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+}
+.header {
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-end;
+  width: 100%;
+  margin-bottom: 1em;
+  padding: 32px;
+  background: #fff;
+  -webkit-box-shadow: 0px 3px 5px 0px rgba(184,175,184,1);
+  -moz-box-shadow: 0px 3px 5px 0px rgba(184,175,184,1);
+  box-shadow: 0px 3px 5px 0px rgba(184,175,184,1);
+}
+header img {
+  width: 100px;
+  height: 100px;
+}
+header h2 {
+  text-align: center;
+  font-size: 3em;
+  color: var(--color-principal);
+}
+.container {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: 100%;
+}
+.container__sub {
+  width: 700px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.column-reverse {
+  flex-direction: column-reverse;
+}
+.column {
+  flex-direction: column;
+}
+.container__button {
+  margin: .5em;
+  min-width: 300px;
+  text-align: center;
+  background: var(--color-principal);
+  color: #eee;
+  padding: 16px;
+  font-size: 2em;
+  cursor: pointer;
+  font-weight: bold;
+  border-radius: 5px;
+  border: none;
+}
+.container__button:hover {
+  background: #c9c9c9;
+  color: #333;
+}
+.visor {
+  display: flex;
+  justify-content: space-around;
+  width: 100%;
+}
+.visor input {
+  padding: 18px;  
+  width: 600px;
+  background: #c9c9c9;
+  color: #333;
+  border-radius: 10px;
+  font-size: 2em;
+  font-weight: bold;
+  text-align: center;
+  border: none;
+  margin: .3em;
+}
+.visor:last-of-type > input {
+  background: var(--color-principal);
+  color: #eee;
+  -webkit-animation: fa-blink .75s linear .3s 3;
+  -moz-animation: fa-blink .75s linear .3s 3;
+  -ms-animation: fa-blink .75s linear .3s 3;
+  -o-animation: fa-blink .75s linear .3s 3;
+  animation: fa-blink .75s linear .3s 3;
+}
+.footer {
+  margin-top: 1em;
+  background: var(--color-principal);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+.footer div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: calc(100%/3);
+  height: 160px;
+}
+.footer div:nth-child(2) {
+  border-left: solid 1px #eee;
+  border-right: solid 1px #eee;
+}
+.footer p {
+  color: #eee;
+  font-size: 2em;
+  text-align: center;
+  font-weight: bold;
+}
+@media only screen and (max-width: 960px) {
+  .visor, .footer {
+    flex-direction: column;
+  }
+  .visor input {
+    width: auto;
+  }
+  .container {
+    justify-content: center;
+  }
+}

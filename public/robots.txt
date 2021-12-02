@@ -1,0 +1,7 @@
+// O asterisco depois de “user-agent” indica que o arquivo robots.txt se aplica a todo tipo de robô da internet que visita o site.
+// # A barra depois de “Disallow” informa ao robô para não visitar nenhuma das páginas do site.
+// "Noindex" serve para garantir que robôs não visitem ou indexem certas páginas.
+// web crawlers: Googlebot, Yahoo! Slurp, bingbot, AhrefsBot, Baiduspider, Ezooms, MJ12bot, YandexBot
+User-agent: *
+Disallow: /
+Noindex: /
