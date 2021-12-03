@@ -125,7 +125,7 @@ header h2 {
   align-items: center;
   justify-content: center;
   width: calc(100%/3);
-  height: 160px;
+  height: 171px;
 }
 .footer div:nth-child(2) {
   border-left: solid 1px #eee;

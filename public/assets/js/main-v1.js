@@ -1,8 +1,13 @@
 /* eslint-env browser */
 /* eslint no-undef: off */
 /* eslint no-alert: off */
+/* eslint no-implied-eval: off */
 
-const id = localStorage.getItem('id_aqm'); // '-Mpsj8fYvpf3l1O_6LgO';
+const id = localStorage.getItem('id_aqm');
+let tempo = 0;
+const container = document.querySelector('#screen');
+const visor_time = document.querySelector('#visor_time');
+
 firebase.auth().onAuthStateChanged(firebaseUser => {
   if (!firebaseUser) {
     firebase
@@ -35,6 +40,33 @@ function createModel_QueueCalls() {
   };
   const getId = firebase.database().ref().child('queueCalls').push(data).key;
   localStorage.setItem('id_aqm', getId);
+}
+
+function startCountdown() {
+  // Se o tempo não for zerado
+  if (tempo - 0 >= 0) {
+    let min = Number(tempo / 60);
+
+    let seg = tempo % 60;
+    // Formata o número menor que dez, ex: 08, 07, ...
+    if (min < 10) {
+      min = `0${min}`;
+      min = min.substr(0, 2);
+    }
+
+    if (seg <= 9) {
+      seg = `0${seg}`;
+    }
+
+    horaImprimivel = `${min}:${seg}`;
+
+    visor_time.innerText = horaImprimivel;
+
+    // 1000ms = 1 segundo
+    setTimeout(`startCountdown()`, 1000);
+
+    tempo += 1;
+  }
 }
 
 function clearDB(e) {
@@ -159,50 +191,50 @@ const createModelQueueCalls = document.querySelector('#createModel_QueueCalls');
 if (createModelQueueCalls)
   createModelQueueCalls.addEventListener('click', createModel_QueueCalls);
 
-window.onload = () => {
-  function updateQueue(data) {
-    const container = document.querySelector('#screen');
-    const visor_nm = document.querySelector('#visor_nm');
-    const visor_pd = document.querySelector('#visor_pd');
+function updateQueue(data) {
+  tempo = 0;
+  const visor_nm = document.querySelector('#visor_nm');
+  const visor_pd = document.querySelector('#visor_pd');
 
-    if (!container) return;
+  if (!container) return;
 
-    if (data.val().length === 0) return;
+  if (data.val().length === 0) return;
 
-    const audio = new Audio(
-      'assets/sounds/salamisound-2028068-ding-dong-bell-doorbell.mp3',
-    );
-    const { client } = data.val();
-    const { local, pass } = client;
-    if (visor_nm && visor_pd) {
-      if (!pass.split('PD')[1]) {
-        visor_nm.innerText = `${local} - ${pass}`;
-      }
-      visor_pd.innerText = `${local} - ${pass}`;
+  const audio = new Audio(
+    'assets/sounds/salamisound-2028068-ding-dong-bell-doorbell.mp3',
+  );
+  const { client } = data.val();
+  const { local, pass } = client;
+  if (visor_nm && visor_pd) {
+    if (!pass.split('PD')[1]) {
+      visor_nm.innerText = `${local} - ${pass}`;
     }
-
-    if (!container) return;
-    const create = document.createElement('div');
-    create.setAttribute('class', 'visor');
-
-    const input1 = document.createElement('input');
-    input1.setAttribute('type', 'text');
-    input1.setAttribute('disabled', 'disabled');
-    input1.setAttribute('value', local);
-
-    const input2 = document.createElement('input');
-    input2.setAttribute('type', 'text');
-    input2.setAttribute('disabled', 'disabled');
-    input2.setAttribute('value', pass);
-    audio.play();
-
-    create.appendChild(input1);
-    create.appendChild(input2);
-    container.appendChild(create);
-
-    document.getElementsByClassName('visor')[0].remove();
+    visor_pd.innerText = `${local} - ${pass}`;
   }
 
+  if (!container) return;
+  const create = document.createElement('div');
+  create.setAttribute('class', 'visor');
+
+  const input1 = document.createElement('input');
+  input1.setAttribute('type', 'text');
+  input1.setAttribute('disabled', 'disabled');
+  input1.setAttribute('value', local);
+
+  const input2 = document.createElement('input');
+  input2.setAttribute('type', 'text');
+  input2.setAttribute('disabled', 'disabled');
+  input2.setAttribute('value', pass);
+  audio.play();
+
+  create.appendChild(input1);
+  create.appendChild(input2);
+  container.appendChild(create);
+
+  document.getElementsByClassName('visor')[0].remove();
+}
+
+if (container) {
   firebase
     .database()
     .ref('calls')
@@ -211,4 +243,5 @@ window.onload = () => {
         updateQueue(item);
       });
     });
-};
+  startCountdown();
+}
