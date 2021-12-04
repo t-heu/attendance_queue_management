@@ -6,12 +6,36 @@
 const id = localStorage.getItem('id_aqm');
 let tempo = 0;
 const queue_ids_calls = [];
+const database = firebase.database();
+const locals = {
+  guiche: 'guichê',
+  consultorio: 'consultório',
+};
+const data_default = {
+  n: 0,
+  p: 0,
+  queue_nm: [
+    {
+      client: {
+        local: 'GUICHÊ 00',
+        pass: 'NM00',
+      },
+    },
+  ],
+  queue_pd: [
+    {
+      client: {
+        local: 'GUICHÊ 00',
+        pass: 'PD00',
+      },
+    },
+  ],
+};
 const audio = new Audio(
   'assets/sounds/salamisound-2028068-ding-dong-bell-doorbell.mp3',
 );
 const container = document.querySelector('#screen');
 const visor_time = document.querySelector('#visor_time');
-const database = firebase.database();
 
 firebase.auth().onAuthStateChanged(firebaseUser => {
   if (!firebaseUser) {
@@ -23,112 +47,78 @@ firebase.auth().onAuthStateChanged(firebaseUser => {
 });
 
 function createModelQueueCalls() {
-  const data = {
-    n: 0,
-    p: 0,
-    queue_nm: [
-      {
-        client: {
-          local: 'GUICHÊ 00',
-          pass: 'NM00',
-        },
-      },
-    ],
-    queue_pd: [
-      {
-        client: {
-          local: 'GUICHÊ 00',
-          pass: 'PD00',
-        },
-      },
-    ],
-  };
-  const getId = database.ref().child('queueCalls').push(data).key;
+  const getId = database.ref().child('queueCalls').push(data_default).key;
   localStorage.setItem('id_aqm', getId);
 }
 
 function startCountdown() {
-  // Se o tempo não for zerado
   if (tempo - 0 >= 0) {
-    let min = Number(tempo / 60);
-
+    let min = tempo / 60;
     let seg = tempo % 60;
-    // Formata o número menor que dez, ex: 08, 07, ...
-    if (min < 10) {
+
+    if (min <= 9) {
       min = `0${min}`;
       min = min.substr(0, 2);
+    } else {
+      min = parseInt(min, 10);
     }
 
     if (seg <= 9) {
       seg = `0${seg}`;
     }
 
-    horaImprimivel = `${min}:${seg}`;
-
-    visor_time.innerText = horaImprimivel;
-
-    // 1000ms = 1 segundo
+    visor_time.innerText = `${min}:${seg}`;
     setTimeout(`startCountdown()`, 1000);
-
     tempo += 1;
   }
 }
 
-function clearDB(e) {
-  const dbDel = database.ref().child('calls');
-
-  dbDel
+function cleanCallsDB(childDefault = 'calls') {
+  console.log(childDefault);
+  database
+    .ref()
+    .child(childDefault)
     .remove()
-    .then(() => (!e ? null : alert('Remove succeeded.')))
-    .catch(error => alert(`Remove failed: ${error.message}`));
+    .then(() => (true ? null : alert('Successfully clean.')))
+    .catch(error => alert(`Clean failed: ${error.message}`));
 }
 
 function generateRecord(e) {
-  firebase
-    .database()
-    .ref(`queueCalls/${id}`)
-    .once('value', item => {
-      const data_updated = item.val();
-      const data_default = {
-        client: {
-          local: 'GUICHÊ 00',
-          pass:
-            e.target.id === 'generate_record_nm'
-              ? `NM${
-                  data_updated.n >= 10
-                    ? (data_updated.n += 1)
-                    : `0${(data_updated.n += 1)}`
-                }`
-              : `PD${
-                  data_updated.p >= 10
-                    ? (data_updated.p += 1)
-                    : `0${(data_updated.p += 1)}`
-                }`,
-        },
-      };
+  database.ref(`queueCalls/${id}`).once('value', item => {
+    const data_updated = item.val();
 
-      if (e.target.id === 'generate_record_nm') {
-        data_updated.queue_nm.push(data_default);
-      } else {
-        data_updated.queue_pd.push(data_default);
-      }
+    if (e.target.id === 'generate_record_pd') {
+      data_default.queue_pd[0].client.pass = `PD${
+        data_updated.p >= 10
+          ? (data_updated.p += 1)
+          : `0${(data_updated.p += 1)}`
+      }`;
+      data_updated.queue_pd.push(data_default.queue_pd[0]);
+    } else {
+      data_default.queue_nm[0].client.pass = `NM${
+        data_updated.n >= 10
+          ? (data_updated.n += 1)
+          : `0${(data_updated.n += 1)}`
+      }`;
+      data_updated.queue_nm.push(data_default.queue_nm[0]);
+    }
 
-      if (id) {
-        const updates = {};
-        updates[`/queueCalls/${id}`] = data_updated;
-        database
-          .ref()
-          .update(updates)
-          .catch(() => {
-            alert('not updated');
-          });
-      }
-    });
+    const updates = {};
+    updates[`/queueCalls/${id}`] = data_updated;
+    database
+      .ref()
+      .update(updates)
+      .catch(() => {
+        alert('not updated');
+      });
+  });
 }
 
 function nextCall(e) {
   database.ref(`queueCalls/${id}`).once('value', item => {
     const data_updated = item.val();
+    const local = window.location.search.split('?')[1].split('l=')[1];
+    const number = window.location.search.split('?')[2].split('n=')[1];
     let element;
     let data;
 
@@ -148,24 +138,18 @@ function nextCall(e) {
       data_updated.queue_pd = element;
     }
 
-    data[0].client.local = `${window.location.search
-      .split('?')[1]
-      .split('l=')[1]
-      .replace('guiche', 'GUICHÊ')
-      .toLocaleUpperCase()} ${
-      window.location.search.split('?')[2].split('n=')[1]
-    }`;
+    data[0].client.local = `${local
+      .replace(local, locals[local])
+      .toLocaleUpperCase()} ${number}`;
 
-    if (id) {
-      const updates = {};
-      updates[`/queueCalls/${id}`] = data_updated;
-      database
-        .ref()
-        .update(updates)
-        .catch(() => {
-          alert('not updated');
-        });
-    }
+    const updates = {};
+    updates[`/queueCalls/${id}`] = data_updated;
+    database
+      .ref()
+      .update(updates)
+      .catch(() => {
+        alert('not updated');
+      });
 
     return database.ref().child('calls').push(data[0]);
   });
@@ -182,41 +166,38 @@ async function updateQueue(data) {
   const { local, pass } = client;
   queue_ids_calls.push(data.key);
 
-  if (visor_nm && visor_pd) {
-    if (pass.split('PD')[1]) {
-      visor_pd.innerText = `${local} - ${pass}`;
-    }
-    visor_nm.innerText = `${local} - ${pass}`;
+  if (pass.split('PD')[1]) {
+    visor_pd.innerText = `${local} - ${pass}`;
   }
+  visor_nm.innerText = `${local} - ${pass}`;
 
   const create = document.createElement('div');
   create.setAttribute('class', 'visor');
 
-  const input1 = document.createElement('input');
-  input1.setAttribute('type', 'text');
-  input1.setAttribute('disabled', 'disabled');
-  input1.setAttribute('value', local);
+  function createInput(inputElementData) {
+    const input = document.createElement('input');
+    input.setAttribute('type', 'text');
+    input.setAttribute('disabled', 'disabled');
+    input.setAttribute('value', inputElementData);
 
-  const input2 = document.createElement('input');
-  input2.setAttribute('type', 'text');
-  input2.setAttribute('disabled', 'disabled');
-  input2.setAttribute('value', pass);
+    create.appendChild(input);
+  }
 
-  create.appendChild(input1);
-  create.appendChild(input2);
+  createInput(local);
+  createInput(pass);
+
   container.appendChild(create);
-
   document.getElementsByClassName('visor')[0].remove();
 }
 
-const clear_queue = document.querySelector('#clearQueue');
-if (clear_queue) clear_queue.addEventListener('click', clearDB);
+const clear_queue_db = document.querySelector('#clearQueue');
+if (clear_queue_db) clear_queue_db.addEventListener('click', cleanCallsDB);
 
-const next_nm = document.querySelector('#next_nm');
-if (next_nm) next_nm.addEventListener('click', nextCall);
+const next_nm_queue = document.querySelector('#next_nm');
+if (next_nm_queue) next_nm_queue.addEventListener('click', nextCall);
 
-const next_pd = document.querySelector('#next_pd');
-if (next_pd) next_pd.addEventListener('click', nextCall);
+const next_pd_queue = document.querySelector('#next_pd');
+if (next_pd_queue) next_pd_queue.addEventListener('click', nextCall);
 
 const generate_record_nm = document.querySelector('#generate_record_nm');
 if (generate_record_nm)
@@ -237,16 +218,12 @@ if (container) {
     snapshot.forEach(item => {
       updateQueue(item).then(() => {
         audio.play();
-        if (queue_ids_calls.length >= 7) {
-          const dbDel = firebase
-            .database()
-            .ref()
-            .child(`/calls/${queue_ids_calls[0]}`);
-
-          dbDel.remove().catch(error => {
-            alert(`Remove failed: ${error.message}`);
-          });
-        }
+        /* queue_ids_calls.forEach(() => {
+          if (queue_ids_calls.length >= 7) {
+            const id_call = queue_ids_calls.shift();
+            cleanCallsDB(`/calls/${id_call}`);
+          }
+        }); */
       });
     });
   });
