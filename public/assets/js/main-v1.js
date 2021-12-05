@@ -134,7 +134,7 @@ function nextCall(e) {
       }
 
       visor_time.innerText = `${min}:${seg}`;
-      setTimeout(`startCountdown()`, 1000);
+      setTimeout(`startCountdownLocal()`, 1000);
       tempo2 += 1;
     }
   }
@@ -167,7 +167,7 @@ function nextCall(e) {
     }
 
     document.querySelector('#pass').innerText = data.client.pass;
-    tempo = 0;
+    tempo2 = 0;
     startCountdownLocal();
 
     const updates = {};
