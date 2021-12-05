@@ -1,5 +1,5 @@
 /* eslint-env browser */
-/* eslint no-undef: off */
+/* global firebase */
 /* eslint no-alert: off */
 /* eslint no-implied-eval: off */
 

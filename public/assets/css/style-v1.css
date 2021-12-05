@@ -56,13 +56,6 @@ header h2 {
   justify-content: center;
   width: 100%;
 }
-.container__sub {
-  width: 800px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-wrap: wrap;
-}
 .column-reverse {
   flex-direction: column-reverse;
 }
@@ -70,13 +63,13 @@ header h2 {
   flex-direction: column;
 }
 .container__button {
-  margin: .5em;
-  min-width: 300px;
+  margin: .4em;
+  min-width: 700px;
   text-align: center;
   background: var(--color-principal);
   color: #eee;
-  padding: 16px;
-  font-size: 2em;
+  padding: 38px;
+  font-size: 36px;
   cursor: pointer;
   font-weight: bold;
   border-radius: 5px;
@@ -136,15 +129,4 @@ header h2 {
   font-size: 2em;
   text-align: center;
   font-weight: bold;
-}
-@media only screen and (max-width: 960px) {
-  .visor, .footer {
-    flex-direction: column;
-  }
-  .visor input {
-    width: auto;
-  }
-  .container {
-    justify-content: center;
-  }
 }

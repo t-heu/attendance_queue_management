@@ -4,8 +4,7 @@
 
 # Screenshot
 <p align="center">
-  <img alt="home" src="./docs/Captura de tela_2021-12-02_18-52-03.png" width="650" />
-  <img alt="home" src="./docs/Captura de tela_2021-12-01_13-33-05.png" width="650" />
+  <img alt="home" src="./docs/attendance_queue_management.png" width="650" />
 </p>
 
 # Como executar

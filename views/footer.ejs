@@ -1,4 +1,4 @@
-    <% if(pathanme ===  '/call') { %>
+    <% if(footer ===  1) { %>
       <footer class="footer">
         <div>
           <p>PRIORIDADE:</p>
@@ -10,6 +10,21 @@
         </div>
         <div>
           <p>TEMPO DE ESPERA 3MIN:</p>
+          <p id="visor_time">00:00</p>
+        </div>
+      </footer>
+    <% } else if (footer === 2) { %>
+      <footer class="footer">
+        <div>
+          <p>LOGADO:</p>
+          <p id="logged"><%= name_local ? name_local : 'GUICHÊ 00' %></p>
+        </div>
+        <div>
+          <p>SENHA:</p>
+          <p id="pass">NM00</p>
+        </div>
+        <div>
+          <p>TEMPO DE ATENDIMENTO:</p>
           <p id="visor_time">00:00</p>
         </div>
       </footer>
