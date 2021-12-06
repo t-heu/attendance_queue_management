@@ -62,6 +62,16 @@ header h2 {
 .column {
   flex-direction: column;
 }
+.campId {
+  margin: .4em;
+  min-width: 700px;
+  padding: 38px;
+  font-size: 36px;
+  cursor: pointer;
+  font-weight: bold;
+  border-radius: 5px;
+  border: solid 3px #333;
+}
 .container__button {
   margin: .4em;
   min-width: 700px;

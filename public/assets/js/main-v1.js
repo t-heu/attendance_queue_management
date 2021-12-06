@@ -3,24 +3,16 @@
 /* eslint no-alert: off */
 /* eslint no-implied-eval: off */
 
-const id_queueCalls = localStorage.getItem('id_queueCalls');
-const id_calls = localStorage.getItem('id_calls');
-let tempo = 0;
-const queue_ids_calls = [];
+const id_aqm = localStorage.getItem('id_aqm');
 const database = firebase.database();
 const locals = {
   guiche: 'guichê',
   consultorio: 'consultório',
 };
-const data_default = {
-  nm: 0,
-  pd: 0,
-  queue_nm: ['NM00'],
-  queue_pd: ['PD00'],
-};
 const audio = new Audio(
   'assets/sounds/salamisound-2028068-ding-dong-bell-doorbell.mp3',
 );
+let tempo = 0;
 const container = document.querySelector('#screen');
 const visor_time = document.querySelector('#visor_time');
 
@@ -46,44 +38,34 @@ function startCountdown() {
   }
 }
 
-function createModelQueueCalls() {
-  const data = {
-    client: {
-      local: 'GUICHÊ 00',
-      pass: 'NM00',
-    },
-  };
-  const getId_queueCalls = database
-    .ref()
-    .child('queueCalls')
-    .push(data_default).key;
-  localStorage.setItem('id_queueCalls', getId_queueCalls);
+function cleanCallsDB() {
+  database.ref(`user_aqm/${id_aqm}`).once('value', item => {
+    const data_updated = item.val();
+    
+    data_updated.calls = null;
+    data_updated.calls = {
+      db: true,
+    };
+    data_updated.queueCalls.nm = 0;
+    data_updated.queueCalls.pd = 0;
+    data_updated.queueCalls.queue_nm = ['NM00'];
+    data_updated.queueCalls.queue_pd = ['PD00'];
 
-  const getId_calls = database.ref().child('calls').push({}).key;
-  database.ref().child(`calls/${getId_calls}`).push(data);
-  localStorage.setItem('id_calls', getId_calls);
-}
-
-function cleanCallsDB(noAlert = false) {
-  database
-    .ref()
-    .child(`calls/${id_calls}`)
-    .remove()
-    .then(() => (noAlert ? null : alert('Successfully clean.')))
-    .catch(error => alert(`Clean failed: ${error.message}`));
-
-  database
-    .ref()
-    .child(`queueCalls/${id_queueCalls}`)
-    .remove()
-    .then(() => (noAlert ? null : alert('Successfully clean.')))
-    .catch(error => alert(`Clean failed: ${error.message}`));
+    const updates = {};
+    updates[`/user_aqm/${id_aqm}`] = data_updated;
+    database
+      .ref()
+      .update(updates)
+      .catch(() => {
+        alert('not updated');
+      });
+  }).catch((err) => alert(err));
 }
 
 function generateRecord(e) {
-  database.ref(`queueCalls/${id_queueCalls}`).once('value', item => {
+  database.ref(`user_aqm/${id_aqm}/queueCalls`).once('value', item => {
     const data_updated = item.val();
-
+    
     if (e.target.id === 'generate_record_pd') {
       data_updated.queue_pd.push(
         `PD${
@@ -105,14 +87,14 @@ function generateRecord(e) {
     }
 
     const updates = {};
-    updates[`/queueCalls/${id_queueCalls}`] = data_updated;
+    updates[`/user_aqm/${id_aqm}/queueCalls`] = data_updated;
     database
       .ref()
       .update(updates)
       .catch(() => {
         alert('not updated');
       });
-  });
+  }).catch((err) => alert(err));
 }
 
 function nextCall(e) {
@@ -139,7 +121,7 @@ function nextCall(e) {
     }
   }
 
-  database.ref(`queueCalls/${id_queueCalls}`).once('value', item => {
+  database.ref(`user_aqm/${id_aqm}/queueCalls`).once('value', item => {
     const data_updated = item.val();
     const local = window.location.search.split('?')[1].split('l=')[1];
     const number = window.location.search.split('?')[2].split('n=')[1];
@@ -171,7 +153,7 @@ function nextCall(e) {
     startCountdownLocal();
 
     const updates = {};
-    updates[`/queueCalls/${id_queueCalls}`] = data_updated;
+    updates[`/user_aqm/${id_aqm}/queueCalls`] = data_updated;
     database
       .ref()
       .update(updates)
@@ -179,7 +161,7 @@ function nextCall(e) {
         alert('not updated');
       });
 
-    return database.ref().child(`calls/${id_calls}`).push(data);
+    return database.ref().child(`user_aqm/${id_aqm}/calls`).push(data);
   });
 }
 
@@ -192,7 +174,6 @@ async function updateQueue(data) {
 
   const { client } = data.val();
   const { local, pass } = client;
-  queue_ids_calls.push(data.key);
 
   if (pass.split('PD')[1]) {
     visor_pd.innerText = `${local} - ${pass}`;
@@ -216,14 +197,7 @@ async function updateQueue(data) {
 
   container.appendChild(create);
   document.getElementsByClassName('visor')[0].remove();
-  /* if (queue_ids_calls.length >= 7) {
-    console.log(queue_ids_calls.length - 6);
-    cleanCallsDB(`/calls/${queue_ids_calls[queue_ids_calls.length - 6]}`, true);
-  } */
 }
-
-const clear_queue_db = document.querySelector('#clearQueue');
-if (clear_queue_db) clear_queue_db.addEventListener('click', cleanCallsDB);
 
 const next_nm_queue = document.querySelector('#next_nm');
 if (next_nm_queue) next_nm_queue.addEventListener('click', nextCall);
@@ -239,14 +213,24 @@ const generate_record_pd = document.querySelector('#generate_record_pd');
 if (generate_record_pd)
   generate_record_pd.addEventListener('click', generateRecord);
 
-const createModel_QueueCalls = document.querySelector(
-  '#createModel_QueueCalls',
-);
-if (createModel_QueueCalls)
-  createModel_QueueCalls.addEventListener('click', createModelQueueCalls);
+const clear_queue_db = document.querySelector('#clearQueue');
+if (clear_queue_db) clear_queue_db.addEventListener('click', cleanCallsDB);
+
+const form_id_aqm = document.querySelector('#form_id_aqm');
+if (form_id_aqm) {
+  if (id_aqm) {
+    document.querySelector('#form_id_aqm').style.display = 'none';
+  }
+  form_id_aqm.addEventListener('click', (e) => {
+    e.preventDefault();
+    const camp_id = document.querySelector('.campId');
+    localStorage.setItem('id_aqm', camp_id.value);
+    document.location.reload();
+  });
+}
 
 if (container) {
-  database.ref(`calls/${id_calls}`).on('value', snapshot => {
+  database.ref(`user_aqm/${id_aqm}/calls`).on('value', snapshot => {
     snapshot.forEach(item => {
       updateQueue(item).then(() => {
         audio.play();
