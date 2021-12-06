@@ -1,5 +1,8 @@
 const { Router } = require('express');
 
+const adminController = require('./app/controller/adminController');
+const authenticationBasic = require('./app/middlewares/auth');
+
 const router = Router();
 
 router.get('/', (request, response) => response.render('home', { footer: 0 }));
@@ -21,6 +24,8 @@ router.get('/local', (request, response) => {
 
   return response.render('local', { footer: 0 });
 });
+router.get('/admin', authenticationBasic, adminController.index);
+router.post('/admin', authenticationBasic, adminController.store);
 router.use('*', (req, res, next) => res.redirect('/'));
 
 module.exports = router;

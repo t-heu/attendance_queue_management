@@ -67,7 +67,6 @@ header h2 {
   min-width: 700px;
   padding: 38px;
   font-size: 36px;
-  cursor: pointer;
   font-weight: bold;
   border-radius: 5px;
   border: solid 3px #333;
@@ -139,4 +138,7 @@ header h2 {
   font-size: 2em;
   text-align: center;
   font-weight: bold;
+}
+footer small {
+  padding: 20px;
 }

@@ -10,7 +10,7 @@
         </div>
         <div>
           <p>TEMPO DE ESPERA 3MIN:</p>
-          <p id="visor_time">00:00</p>
+          <p id="visor_time_wait">00:00</p>
         </div>
       </footer>
     <% } else if (footer === 2) { %>
@@ -25,11 +25,13 @@
         </div>
         <div>
           <p>TEMPO DE ATENDIMENTO:</p>
-          <p id="visor_time">00:00</p>
+          <p id="visor_time_attendance">00:00</p>
         </div>
       </footer>
     <% } else { %>
-      <footer></footer>
+      <footer class="container column">
+        <small><b><%= '</>' %></b> with by t-heu</small>
+      </footer>
     <% } %>
 
     <script defer src="/assets/js/firebaseConfig.js"></script>

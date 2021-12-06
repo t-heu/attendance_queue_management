@@ -14,9 +14,10 @@ const audio = new Audio(
 );
 let tempo = 0;
 const container = document.querySelector('#screen');
-const visor_time = document.querySelector('#visor_time');
+const visor_time_wait = document.querySelector('#visor_time_wait');
+const visor_time_attendance = document.querySelector('#visor_time_attendance');
 
-function startCountdown() {
+function waitCounter() {
   if (tempo - 0 >= 0) {
     let min = tempo / 60;
     let seg = tempo % 60;
@@ -32,74 +33,80 @@ function startCountdown() {
       seg = `0${seg}`;
     }
 
-    visor_time.innerText = `${min}:${seg}`;
-    setTimeout(`startCountdown()`, 1000);
+    visor_time_wait.innerText = `${min}:${seg}`;
+    setTimeout(`waitCounter()`, 1000);
     tempo += 1;
   }
 }
 
 function cleanCallsDB() {
-  database.ref(`user_aqm/${id_aqm}`).once('value', item => {
-    const data_updated = item.val();
-    
-    data_updated.calls = null;
-    data_updated.calls = {
-      db: true,
-    };
-    data_updated.queueCalls.nm = 0;
-    data_updated.queueCalls.pd = 0;
-    data_updated.queueCalls.queue_nm = ['NM00'];
-    data_updated.queueCalls.queue_pd = ['PD00'];
+  database
+    .ref(`user_aqm/${id_aqm}`)
+    .once('value', item => {
+      const data_updated = item.val();
 
-    const updates = {};
-    updates[`/user_aqm/${id_aqm}`] = data_updated;
-    database
-      .ref()
-      .update(updates)
-      .catch(() => {
-        alert('not updated');
-      });
-  }).catch((err) => alert(err));
+      data_updated.calls = null;
+      data_updated.calls = {
+        db: true,
+      };
+      data_updated.queueCalls.nm = 0;
+      data_updated.queueCalls.pd = 0;
+      data_updated.queueCalls.queue_nm = ['NM00'];
+      data_updated.queueCalls.queue_pd = ['PD00'];
+
+      const updates = {};
+      updates[`/user_aqm/${id_aqm}`] = data_updated;
+      database
+        .ref()
+        .update(updates)
+        .catch(() => {
+          alert('not updated');
+        });
+    })
+    .catch(err => alert(err));
 }
 
 function generateRecord(e) {
-  database.ref(`user_aqm/${id_aqm}/queueCalls`).once('value', item => {
-    const data_updated = item.val();
-    
-    if (e.target.id === 'generate_record_pd') {
-      data_updated.queue_pd.push(
-        `PD${
-          data_updated.pd >= 9
-            ? (data_updated.pd += 1)
-            : `0${(data_updated.pd += 1)}`
-        }`,
-      );
-      alert(`Sua senha é: PD${data_updated.pd}`);
-    } else {
-      data_updated.queue_nm.push(
-        `NM${
-          data_updated.nm >= 9
-            ? (data_updated.nm += 1)
-            : `0${(data_updated.nm += 1)}`
-        }`,
-      );
-      alert(`Sua senha é: NM${data_updated.nm}`);
-    }
+  database
+    .ref(`user_aqm/${id_aqm}/queueCalls`)
+    .once('value', item => {
+      const data_updated = item.val();
 
-    const updates = {};
-    updates[`/user_aqm/${id_aqm}/queueCalls`] = data_updated;
-    database
-      .ref()
-      .update(updates)
-      .catch(() => {
-        alert('not updated');
-      });
-  }).catch((err) => alert(err));
+      if (e.target.id === 'generate_record_pd') {
+        data_updated.queue_pd.push(
+          `PD${
+            data_updated.pd >= 9
+              ? (data_updated.pd += 1)
+              : `0${(data_updated.pd += 1)}`
+          }`,
+        );
+        alert(`Sua senha é: PD${data_updated.pd}`);
+      } else {
+        data_updated.queue_nm.push(
+          `NM${
+            data_updated.nm >= 9
+              ? (data_updated.nm += 1)
+              : `0${(data_updated.nm += 1)}`
+          }`,
+        );
+        alert(`Sua senha é: NM${data_updated.nm}`);
+      }
+
+      const updates = {};
+      updates[`/user_aqm/${id_aqm}/queueCalls`] = data_updated;
+      database
+        .ref()
+        .update(updates)
+        .catch(() => {
+          alert('not updated');
+        });
+    })
+    .catch(err => alert(err));
 }
 
 function nextCall(e) {
   let tempo2 = 0;
-  function startCountdownLocal() {
+  function serviceCounter() {
     if (tempo2 - 0 >= 0) {
       let min = tempo2 / 60;
       let seg = tempo2 % 60;
@@ -115,8 +122,8 @@ function nextCall(e) {
         seg = `0${seg}`;
       }
 
-      visor_time.innerText = `${min}:${seg}`;
-      setTimeout(`startCountdownLocal()`, 1000);
+      visor_time_attendance.innerText = `${min}:${seg}`;
+      setTimeout(`serviceCounter()`, 1000);
       tempo2 += 1;
     }
   }
@@ -150,7 +157,7 @@ function nextCall(e) {
 
     document.querySelector('#pass').innerText = data.client.pass;
     tempo2 = 0;
-    startCountdownLocal();
+    serviceCounter();
 
     const updates = {};
     updates[`/user_aqm/${id_aqm}/queueCalls`] = data_updated;
@@ -170,7 +177,7 @@ async function updateQueue(data) {
   const visor_pd = document.querySelector('#visor_pd');
   tempo = 0;
 
-  if (data.val().length === 0) return;
+  if (!data.val().length || data.val().length === 0) return;
 
   const { client } = data.val();
   const { local, pass } = client;
@@ -216,16 +223,36 @@ if (generate_record_pd)
 const clear_queue_db = document.querySelector('#clearQueue');
 if (clear_queue_db) clear_queue_db.addEventListener('click', cleanCallsDB);
 
+const logout = document.querySelector('#logout');
+if (logout)
+  logout.addEventListener('click', () => {
+    localStorage.clear('id_aqm');
+    return document.location.reload();
+  });
+
 const form_id_aqm = document.querySelector('#form_id_aqm');
 if (form_id_aqm) {
   if (id_aqm) {
     document.querySelector('#form_id_aqm').style.display = 'none';
+  } else {
+    document.querySelector('#logged').style.display = 'none';
   }
-  form_id_aqm.addEventListener('click', (e) => {
+  form_id_aqm.addEventListener('submit', e => {
     e.preventDefault();
-    const camp_id = document.querySelector('.campId');
-    localStorage.setItem('id_aqm', camp_id.value);
-    document.location.reload();
+
+    const camp_id = e.target[0].value;
+    database
+      .ref()
+      .child(`user_aqm/${camp_id}`)
+      .orderByChild('db')
+      .equalTo(true)
+      .once('value', snapshot => {
+        if (!snapshot.val()) {
+          return alert('Error not exist');
+        }
+        localStorage.setItem('id_aqm', camp_id);
+        return document.location.reload();
+      });
   });
 }
 
@@ -237,5 +264,5 @@ if (container) {
       });
     });
   });
-  startCountdown();
+  waitCounter();
 }

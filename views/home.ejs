@@ -3,9 +3,18 @@
 <%- include('header') %>
 
 <main class="container column">
-  <a class="container__button"  href="/call">TELA DE CHAMADAS</a>
-  <a class="container__button"  href="/generate">TELA DE FICHAS</a>
-  <a class="container__button" href="/local">LOGIN</a>
+  <form id="form_id_aqm" class="container column">
+    <input type="text" class="campId" placeholder="-id" />
+    <button class="container__button" type="submit">LOGIN</button>
+  </form>
+
+  <div id="logged" class="container column">
+    <a class="container__button"  href="/call">TELA DE CHAMADAS</a>
+    <a class="container__button"  href="/generate">TELA DE FICHAS</a>
+    <a class="container__button" href="/local">LOGIN</a>
+    <small>ADMIN:</small>
+    <a class="container__button" id="logout">DESCONECTAR-SE</a>
+  </div>
 </main>
 
 <%- include('footer') %>
