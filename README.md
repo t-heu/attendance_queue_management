@@ -7,8 +7,13 @@
   <img alt="home" src="./docs/attendance_queue_management.png" width="650" />
 </p>
 
+# Tecnologias usadas
+- express
+- ejs (template engine)
+- firebase
+
 # Como executar
-- crie o arquino `firebaseConfig.js` em `/public/assets/js` e set suas configurações do firebase.
+- crie o arquivo `firebaseConfig.js` em `/public/assets/js` e set suas configurações do firebase, e set também suas configurações no `.env`
 ```shell
 yarn
 yarn dev or yarn start
