@@ -13,7 +13,7 @@
 - firebase
 
 # How to run
-- create the `firebaseConfig.js` file in `/public/assets/js` and set your firebase settings, and also set your settings in `.env`
+- set your firebase settings, and also set your settings in `.env`
 ```shell
 yarn
 yarn dev or yarn start

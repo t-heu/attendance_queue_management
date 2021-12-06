@@ -175,7 +175,6 @@ function nextCall(e) {
 async function updateQueue(data) {
   const visor_nm = document.querySelector('#visor_nm');
   const visor_pd = document.querySelector('#visor_pd');
-  tempo = 0;
 
   if (!data.val().length || data.val().length === 0) return;
 
@@ -264,5 +263,6 @@ if (container) {
       });
     });
   });
+  tempo = 0;
   waitCounter();
 }

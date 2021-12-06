@@ -34,7 +34,16 @@
       </footer>
     <% } %>
 
-    <script defer src="/assets/js/firebaseConfig.js"></script>
-    <script defer src="/assets/js/main-v1.js"></script>
+    <% if (firebaseConfig) { %>
+      <script defer type="module">
+        /* eslint-env browser */
+        /* eslint no-undef: off */
+        /* eslint no-alert: off */
+        const config = '<%- JSON.stringify(firebaseConfig) %>';
+        const configSerialized = JSON.parse(config)
+        firebase.initializeApp(configSerialized);
+      </script>
+      <script defer src="/assets/js/main-v1.js"></script>
+    <% } %>
   </body>
 </html>
