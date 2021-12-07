@@ -12,12 +12,12 @@ const locals = {
 const audio = new Audio(
   'assets/sounds/salamisound-2028068-ding-dong-bell-doorbell.mp3',
 );
-let tempo = 0;
+let count1 = 0;
 const container = document.querySelector('#screen');
 const visor_time_wait = document.querySelector('#visor_time_wait');
 const visor_time_attendance = document.querySelector('#visor_time_attendance');
 
-function waitCounter() {
+function counter(tempo) {
   if (tempo - 0 >= 0) {
     let min = tempo / 60;
     let seg = tempo % 60;
@@ -33,10 +33,9 @@ function waitCounter() {
       seg = `0${seg}`;
     }
 
-    visor_time_wait.innerText = `${min}:${seg}`;
-    setTimeout(`waitCounter()`, 1000);
-    tempo += 1;
+    return `${min}:${seg}`;
   }
+  return '00:00';
 }
 
 function cleanCallsDB() {
@@ -105,29 +104,7 @@ function generateRecord(e) {
 }
 
 function nextCall(e) {
-  let tempo2 = 0;
-  function serviceCounter() {
-    if (tempo2 - 0 >= 0) {
-      let min = tempo2 / 60;
-      let seg = tempo2 % 60;
-
-      if (min <= 9) {
-        min = `0${min}`;
-        min = min.substr(0, 2);
-      } else {
-        min = parseInt(min, 10);
-      }
-
-      if (seg <= 9) {
-        seg = `0${seg}`;
-      }
-
-      visor_time_attendance.innerText = `${min}:${seg}`;
-      setTimeout(`serviceCounter()`, 1000);
-      tempo2 += 1;
-    }
-  }
-
+  let count2 = 0;
   database.ref(`user_aqm/${id_aqm}/queueCalls`).once('value', item => {
     const data_updated = item.val();
     const local = window.location.search.split('?')[1].split('l=')[1];
@@ -156,8 +133,10 @@ function nextCall(e) {
     }
 
     document.querySelector('#pass').innerText = data.client.pass;
-    tempo2 = 0;
-    serviceCounter();
+    count2 = 0;
+    setInterval(() => {
+      visor_time_attendance.innerText = counter((count2 += 1));
+    }, 1000);
 
     const updates = {};
     updates[`/user_aqm/${id_aqm}/queueCalls`] = data_updated;
@@ -263,6 +242,8 @@ if (container) {
       });
     });
   });
-  tempo = 0;
-  waitCounter();
+  count1 = 0;
+  setInterval(() => {
+    visor_time_wait.innerText = counter((count1 += 1));
+  }, 1000);
 }
