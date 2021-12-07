@@ -155,7 +155,7 @@ async function updateQueue(data) {
   const visor_nm = document.querySelector('#visor_nm');
   const visor_pd = document.querySelector('#visor_pd');
 
-  if (!data.val().length || data.val().length === 0) return;
+  if (!data.val().client || data.val().length === 0) return;
 
   const { client } = data.val();
   const { local, pass } = client;
