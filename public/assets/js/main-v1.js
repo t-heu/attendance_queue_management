@@ -247,3 +247,37 @@ if (container) {
     visor_time_wait.innerText = counter((count1 += 1));
   }, 1000);
 }
+
+// make the whole serviceworker process into a promise so later on we can
+// listen to it and in case new content is available a toast will be shown
+window.isUpdateAvailable = new Promise((resolve, reject) => {
+  // lazy way of disabling service workers while developing
+  if (
+    'serviceWorker' in navigator &&
+    ['localhost', '127'].indexOf(window.location.hostname) === -1
+  ) {
+    // register service worker file
+    navigator.serviceWorker
+      .register('service-worker.js')
+      .then(reg => {
+        reg.onupdatefound = () => {
+          const installingWorker = reg.installing;
+          installingWorker.onstatechange = () => {
+            if (installingWorker.state === 'installed') {
+              if (navigator.serviceWorker.controller) {
+                // new update available
+                resolve(true);
+              } else {
+                // no update available
+                reject();
+              }
+            }
+          };
+        };
+      })
+      .catch(err => {
+        console.error('[SW ERROR]', err);
+        reject();
+      });
+  }
+});
