@@ -8,7 +8,7 @@
   "background_color": "#fff",
   "display": "standalone",
   "theme_color": "#2A669D",
-  "version": "1.0.3",
+  "version": "1.0.0",
   "icons": [
     {
       "src": "/assets/icons/logo.png",
