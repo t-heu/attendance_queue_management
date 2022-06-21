@@ -2,15 +2,15 @@
 [![Linkedin Badge](https://img.shields.io/badge/-matheusgbatista-blue?style=flat-square&logo=Linkedin&logoColor=white&link=https://www.linkedin.com/in/matheusgbatista-3392bb153/)](https://www.linkedin.com/in/matheusgbatista/) 
 [![MyWeb Badge](https://img.shields.io/badge/-t--heu.github.io-333?style=flat-square&link=https://t-heu.github.io/)](https://t-heu.github.io) 
 
-# Prototype
+# 📷 Prototype
 <p align="center">
   <img alt="home" src="./docs/attendance_queue_management.png" width="650" />
 </p>
 
-# Technologies used
-- express
-- ejs (template engine)
-- firebase
+# ⚡ Tech Stack
+- [Express](https://expressjs.com/)
+- [Ejs (template engine)](https://ejs.co/)
+- [Firebase](https://firebase.google.com)
 
 # How to run
 - set your firebase settings, and also set your settings in `.env`
