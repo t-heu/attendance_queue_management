@@ -12,7 +12,7 @@
 - [Ejs (template engine)](https://ejs.co/)
 - [Firebase](https://firebase.google.com)
 
-# How to run
+# ⚙️ How to run
 - set your firebase settings, and also set your settings in `.env`
 ```shell
 yarn
