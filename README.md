@@ -4,7 +4,7 @@
 
 # 📷 Prototype
 <p align="center">
-  <img alt="home" src="./docs/attendance_queue_management.png" width="650" />
+  <img alt="home" src="./docs/previe.png" width="650" />
 </p>
 
 # ⚡ Tech Stack
